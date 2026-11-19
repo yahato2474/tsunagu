@@ -54,6 +54,39 @@ launchctl bootout gui/$(id -u)/local.tsunagu
 rm ~/Library/LaunchAgents/local.tsunagu.plist
 ```
 
+## Windows 版
+
+`windows/Tsunagu.ps1` は同じ機能をタスクバーの通知領域に出す Windows 版（PowerShell + WinForms）。
+ビルド不要で、スマート アプリ コントロールが有効な PC でも動く。左クリック・右クリックどちらでもメニューが開く。
+
+| 操作 | 対象 | 中身 |
+|---|---|---|
+| 画面共有 (RustDesk) | iOS 以外 | RustDesk で Tailscale の IP に直接接続（`rustdesk --connect <IP>`） |
+| 画面共有 (VNC) | macOS | TigerVNC などの VNC ビューアで Mac の画面共有に接続 |
+| リモートデスクトップ | Windows | `mstsc /v:<MagicDNS名>` |
+| SSH (ターミナル) | iOS 以外 | Windows Terminal で `ssh <MagicDNS名>` |
+| ファイルを送る (Taildrop) | 受信できる端末 | `tailscale file cp <ファイル> <IP>:` |
+
+RustDesk の IP 直接接続を使うには、接続先の RustDesk で「設定 → セキュリティ → IP直接アクセスを有効にする」をオンにする。
+Tailscale の中だけで通信するので、中継サーバーを通らず速い。
+それができない端末は、`%APPDATA%\Tsunagu\rustdesk-ids.json` に `{"mac-mini": "<RustDesk ID>"}` のように書くと ID で接続する。
+RustDesk は `C:\Program Files\RustDesk` か `%LOCALAPPDATA%\Programs\RustDesk`（管理者権限のいらないポータブル版）に置く。
+
+起動:
+
+```powershell
+conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File windows\Tsunagu.ps1
+```
+
+動作確認（メニューの内容を文字で出して終了）:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File windows\Tsunagu.ps1 -Dump
+```
+
+ログイン時の自動起動は、メニューの「Windows 起動時に開く」で切り替える（`HKCU\...\Run` に登録）。
+タスクバーに常に出すには、設定 → 個人用設定 → タスク バー → その他のシステム トレイ アイコン で「Windows PowerShell」をオンにする。
+
 ## ライセンス
 
 MIT License。詳しくは [LICENSE](LICENSE) を参照。
