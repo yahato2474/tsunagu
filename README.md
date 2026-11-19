@@ -53,3 +53,7 @@ launchctl bootout gui/$(id -u)/local.tsunagu
 ```bash
 rm ~/Library/LaunchAgents/local.tsunagu.plist
 ```
+
+## ライセンス
+
+MIT License。詳しくは [LICENSE](LICENSE) を参照。
