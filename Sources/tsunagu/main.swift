@@ -5,6 +5,10 @@ import AppKit
 
 let tailscalePath = "/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
+// RDP が使えない Windows (Home エディションなど) は RustDesk で繋ぐ。
+// Tailscale の IP へ直接つなぐので、相手側の RustDesk で「直接 IP アクセスを有効化」が必要。
+let rustdeskHosts: Set<String> = ["lg-gram"]
+
 struct Device {
     let name: String       // MagicDNS 名の先頭ラベル (例: mac-mini)
     let dnsName: String    // 末尾のドットを除いた FQDN
@@ -204,9 +208,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 m.addItem(ClosureItem("画面共有", symbol: "rectangle.on.rectangle") { openURL("vnc://\(d.dnsName)") })
                 m.addItem(ClosureItem("SSH (ターミナル)", symbol: "terminal") { openURL("ssh://\(d.dnsName)") })
             case "windows":
-                m.addItem(ClosureItem("リモートデスクトップ", symbol: "rectangle.on.rectangle") {
-                    openURL("rdp://full%20address=s:\(d.ip):3389")
-                })
+                if rustdeskHosts.contains(d.name) {
+                    m.addItem(ClosureItem("リモートデスクトップ (RustDesk)", symbol: "rectangle.on.rectangle") {
+                        openURL("rustdesk://connection/new/\(d.ip)")
+                    })
+                } else {
+                    m.addItem(ClosureItem("リモートデスクトップ", symbol: "rectangle.on.rectangle") {
+                        openURL("rdp://full%20address=s:\(d.ip):3389")
+                    })
+                }
                 m.addItem(ClosureItem("SSH (ターミナル)", symbol: "terminal") { openURL("ssh://\(d.dnsName)") })
             case "ios":
                 break
